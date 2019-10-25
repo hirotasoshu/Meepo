@@ -1,5 +1,7 @@
 import numpy as np
 from sklearn.neighbors import KDTree
+from sklearn.cluster import DBSCAN
+import matplotlib.pyplot as plt
 
 
 class KDTreeLabeling:
@@ -22,7 +24,22 @@ class KDTreeLabeling:
                     labels[idx] = -1
                 else:
                     labels[idx] = classes[idx]
+        labels = self._calc_labels_for_mix_points(labels, space)
         return labels
+
+    def _calc_labels_for_mix_points(self, labels, space):
+        mixed_points = space[labels == -1]
+        #
+        if (len(mixed_points)):
+            mixed_points = DBSCAN(eps=3, min_samples=2).fit(mixed_points)
+            mixed_points_labels = np.array([(label+1)*(-1) for label in mixed_points.labels_])
+            j = 0
+            for i in range(len(labels)):
+                if labels[i] == -1:
+                    labels[i] = mixed_points_labels[j]
+                    j += 1
+        return labels
+
 
     def fit(self, space):
         if space.size == 0:
@@ -34,8 +51,11 @@ class KDTreeLabeling:
         return labels
 
 
-
-labeling = KDTreeLabeling(r=1, bound=0, stream_count=1, params=3, len_=2)
-space = np.array([[0, 0, 0], [1, 1, 1]])
-print(labeling.fit(space))
-
+if __name__ == "__main__":
+    dots = [np.random.rand(2) for i in range(100)]
+    dots = np.array(dots)
+    labeling = KDTreeLabeling(r=2e-1, bound=6, stream_count=5, params=2, len_=20)
+    labels = labeling.fit(dots)
+    plt.scatter([dots[0] for i in range(len(dots))], [dots[1] for i in range(len(dots))], c=labels)
+    plt.show()
+    print(labels)
