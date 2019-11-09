@@ -58,8 +58,9 @@ def test_on_points_that_do_not_mix(space, classes, expected_labels):
 
 
 @pytest.mark.parametrize("space, classes, expected_labels", [
-    (np.array([[5, 5], [4, 4]]), np.array([0, 1]), [-1, -1])
-], ids=['two_mixed_points'])
+    (np.array([[5, 5], [4, 4]]), np.array([0, 1]), [-1, -1]),
+    (np.array([[7, 7], [4, 4], [5, 5]]), np.array([0, 0, 1]), [0, -1, -1])
+], ids=['two_mixed_points', 'one_point_from_class_and_two_mixed_points'])
 def test_on_mixed_points(space, classes, expected_labels):
     labeling = KDTreeLabeling(r=2, bound=0)
     assert np.array_equal(labeling.fit_predict(space, classes), expected_labels)
