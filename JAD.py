@@ -33,13 +33,13 @@ class JAD:
         return labels
 
     def _get_mixed_points(self, classes, labels, space, tree):
-        for idx in range(len(classes)):
+        for idx, class_ in enumerate(classes):
             nears_ids = tree.query_radius(space[idx].reshape(1, -1), r=self.r, return_distance=False)[0]
-            other_points = nears_ids[classes[nears_ids] != classes[idx]]
+            other_points = nears_ids[classes[nears_ids] != class_]
             if other_points.shape[0] > self.bound:
                 labels[idx] = -1
             else:
-                labels[idx] = classes[idx]
+                labels[idx] = class_
         return labels
 
     def fit_predict(self, space, classes):
